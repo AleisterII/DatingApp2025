@@ -1,16 +1,20 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.interfaces;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class AccountController(AppDbContext context) : BaseApiController
+public class AccountController(AppDbContext context, ITokenService tokenService) : BaseApiController
 {
     [HttpPost("register")]
     public async Task<ActionResult<AppUser>> Register(RegisterRequest request)
@@ -34,7 +38,7 @@ public class AccountController(AppDbContext context) : BaseApiController
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AppUser>> Login(LoginRequest request)
+    public async Task<ActionResult<UserResponse>> Login(LoginRequest request)
     {
         var user = await context.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
 
@@ -46,10 +50,16 @@ public class AccountController(AppDbContext context) : BaseApiController
 
         for (var i = 0; i < computedHash.Length; i++)
         {
-            if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");  
+            if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
         }
 
-        return user;
+        return new UserResponse
+        {
+            Id = user.Id,
+            DisplayName = user.DisplayName,
+            Email = user.Email,
+            Token = tokenService.CreateToken(user)
+        };
     }
 
     private async Task<bool> UserExists(string email)
