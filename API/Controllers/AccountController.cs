@@ -1,16 +1,11 @@
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
-using System.Security.Principal;
 using System.Text;
 using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
 using API.interfaces;
-using API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
@@ -21,9 +16,7 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
     public async Task<ActionResult<UserResponse>> Register(RegisterRequest request)
     {
         if (await UserExists(request.Email)) return BadRequest("Email is already in use");
-
         using var hmac = new HMACSHA512();
-
         var user = new AppUser
         {
             DisplayName = request.DisplayName,
@@ -31,7 +24,6 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
             PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(request.Password)),
             PasswordSalt = hmac.Key
         };
-
         context.Users.Add(user);
         await context.SaveChangesAsync();
 
@@ -41,14 +33,10 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
     [HttpPost("login")]
     public async Task<ActionResult<UserResponse>> Login(LoginRequest request)
     {
-        var user = await context.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
-
-        if (user == null) return Unauthorized("Invalid email");
-
+        var user = await context.Users.SingleOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null) return Unauthorized("Invalid email or password");
         using var hmac = new HMACSHA512(user.PasswordSalt);
-
         var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(request.Password));
-
         for (var i = 0; i < computedHash.Length; i++)
         {
             if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
