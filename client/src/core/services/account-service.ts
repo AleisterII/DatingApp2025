@@ -3,6 +3,7 @@ import { inject, signal } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { User } from '../../types/user';
 import { tap } from 'rxjs/operators';
+import { RegisterCreds } from '../../types/registerCreds';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,16 @@ export class AccountService {
   private http = inject(HttpClient);
   currentUser = signal<User | null>(null);
   baseUrl = 'https://localhost:5001/api/';
+
+  register(creds: RegisterCreds) {
+    return this.http.post<User>(this.baseUrl + "account/register", creds).pipe(
+      tap(user => {
+        if (user){
+          this.currentUser.set(user);
+        }
+      })
+    );
+  }
 
   login(creds: any) {
     return this.http.post<User>(this.baseUrl + "account/login", creds).pipe(
