@@ -22,6 +22,7 @@ export class Nav {
       next: response => {
         this.router.navigateByUrl("/members");
         this.creds = {};
+        this.toast.success("Logged in!");
       },
       error: error => {
         this.toast.error(error.error);
