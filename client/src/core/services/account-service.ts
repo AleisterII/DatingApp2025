@@ -12,13 +12,13 @@ import { Observable } from 'rxjs';
 export class AccountService {
   private http = inject(HttpClient);
   currentUser = signal<User | null>(null);
-  baseUrl = 'https://localhost:5001/api/';
+  baseUrl = "https://localhost:5001/api/";
 
   register(creds: RegisterCreds): Observable<User> {
     return this.http.post<User>(this.baseUrl + "account/register", creds).pipe(
       tap(user => {
-        if (user){
-          this.currentUser.set(user);
+        if (user) {
+          this.setCurrentUser(user);
         }
       })
     );
@@ -27,12 +27,16 @@ export class AccountService {
   login(creds: LoginCreds): Observable<User> {
     return this.http.post<User>(this.baseUrl + "account/login", creds).pipe(
       tap(user => {
-        if (user){
-          //localStorage.setItem("user", JSON.stringify(user))
-          this.currentUser.set(user);
+        if (user) {
+          this.setCurrentUser(user);
         }
       })
     );
+  }
+
+  setCurrentUser(user: User) {
+    localStorage.setItem("user", JSON.stringify(user));
+    this.currentUser.set(user);
   }
 
   logout() {
