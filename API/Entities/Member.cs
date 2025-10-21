@@ -17,6 +17,7 @@ public class Member
     public required string Country { get; set; }
 
     // Navigation properties
+    [JsonIgnore]
     [ForeignKey(nameof(Id))]
     public AppUser User { get; set; } = null!;
 
