@@ -17,12 +17,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: "members", component: MemberList },
-      { path: "members/{id}", component: MemberDetail },
+      { path: "members/:id", component: MemberDetail },
       { path: "lists", component: Lists },
       { path: "messages", component: Messages }
     ]
   },
-  { path: "errors", component: TestErrors},
-  { path: "server-error", component: ServerError},
+  { path: "errors", component: TestErrors },
+  { path: "server-error", component: ServerError },
   { path: "**", component: NotFound }
 ];
