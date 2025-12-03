@@ -3,8 +3,8 @@ using System.Text;
 using API.Data;
 using API.DTOs;
 using API.Entities;
-using API.Extensions;
 using API.Interfaces;
+using API.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +44,7 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
 
         return user.ToDto(tokenService);
     } 
+
     private async Task<bool> EmailExists(string email)
     {
         return await context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower());
