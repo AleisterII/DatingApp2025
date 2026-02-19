@@ -100,6 +100,6 @@ public class MembersController(IMembersRepository membersRepository,
             return photo;
         }
 
-        return BadRequest("Somehting went wrong!");
+        return BadRequest("Something went wrong!");
     }
 }
