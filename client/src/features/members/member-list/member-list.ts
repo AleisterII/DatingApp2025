@@ -66,6 +66,7 @@ export class MemberList implements OnInit {
 
   get displayMesage(): string {
     const defaultParams = new MemberParams();
+    this.updatedParams = new MemberParams();
     const filters: string[] = [];
 
     if (this.updatedParams.gender) {
