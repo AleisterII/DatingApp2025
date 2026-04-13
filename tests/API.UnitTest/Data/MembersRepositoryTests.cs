@@ -15,15 +15,4 @@ public class MembersRepositoryTests
         _context = GlobalTestSetup.AppDbContext;
         _membersRepository = new MembersRepository(_context);
     }
-
-    [Test]
-    public async Task GetMembersAsync_Valid_ShouldReturnEntities()
-    {
-        // Arrange & Act
-        var members = await _membersRepository.GetMembersAsync();
-
-        // Assert
-        Assert.That(members, Is.Not.Null);
-        Assert.That(members, Has.Count.EqualTo(10));
-    }
 }

@@ -1,4 +1,5 @@
 using API.Entities;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,11 +20,18 @@ public class MembersRepository(AppDbContext context) : IMembersRepository
                             .SingleOrDefaultAsync(m => m.Id == id);
     }
 
-    public async Task<IReadOnlyList<Member>> GetMembersAsync()
+    public async Task<PaginationResult<Member>> GetMembersAsync(MemberRequest request)
     {
-        return await context.Members
-            // .Include(m => m.Photos)
-            .ToListAsync();
+        var query = context.Members.AsQueryable();
+
+        query = query.Where(x => x.Id != request.CurrentMemberId);
+
+        if (!string.IsNullOrEmpty(request.Gender))
+        {
+            query = query.Where(x => x.Gender == request.Gender);
+        }
+
+        return await Pagination.CreateAsync(query, request.PageNumber, request.PageSize);
     }
 
     public async Task<IReadOnlyList<Photo>> GetPhotosAsync(string memberId)
