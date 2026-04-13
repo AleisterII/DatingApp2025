@@ -36,8 +36,8 @@
     </ItemGroup>
   </Target>
 
-  <!-- <Target Name="NSwagSpec" AfterTargets="Build">
+  <Target Name="NSwagSpec" AfterTargets="Build">
     <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" WorkingDirectory="../../nswag/document-generator" Command="$(NSwagExe_Net90) run openapi.nswag /variables:Configuration=$(Configuration),Project=&quot;$(MSBuildProjectDirectory)/$(MSBuildProjectFile)&quot;,MsBuildOutputPath=&quot;$(MSBuildProjectDirectory)/$(OutDir)&quot;" />
-  </Target> -->
+  </Target>
 
 </Project>
