@@ -9,14 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CloudinaryDotNet" Version="1.28.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
-    <PackageReference Include="NSwag.MSBuild" Version="14.6.2" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageReference Include="CloudinaryDotNet" Version="1.29.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.18.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.7.1" />
+    <PackageReference Include="NSwag.MSBuild" Version="14.7.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -30,14 +30,13 @@
     <Delete Files="@(FilesToDelete)" />
   </Target>
   <Target Name="NSwag" BeforeTargets="CoreCompile;PrepareResource">
-    <Exec Command="$(NSwagExe_Net90) run /runtime:Net90 /variables:OutputPath=&quot;$(MSBuildProjectDirectory)/$(IntermediateOutputPath)&quot;" WorkingDirectory="../../nswag" />
+    <Exec Command="$(NSwagExe_Net90) run /runtime:Net90 /variables:OutputPath=$(MSBuildProjectDirectory)/$(IntermediateOutputPath)" WorkingDirectory="../../nswag" />
     <ItemGroup>
       <Compile Include="$(IntermediateOutputPath)/*.generated.cs" />
     </ItemGroup>
   </Target>
-
   <Target Name="NSwagSpec" AfterTargets="Build">
-    <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" WorkingDirectory="../../nswag/document-generator" Command="$(NSwagExe_Net90) run openapi.nswag /variables:Configuration=$(Configuration),Project=&quot;$(MSBuildProjectDirectory)/$(MSBuildProjectFile)&quot;,MsBuildOutputPath=&quot;$(MSBuildProjectDirectory)/$(OutDir)&quot;" />
+    <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" WorkingDirectory="../../nswag/document-generator" Command="$(NSwagExe_Net90) run openapi.nswag /variables:Configuration=$(Configuration),Project=$(MSBuildProjectDirectory)/$(MSBuildProjectFile),MsBuildOutputPath=$(MSBuildProjectDirectory)/$(OutDir)" />
   </Target>
 
 </Project>
