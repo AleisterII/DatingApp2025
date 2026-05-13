@@ -13,8 +13,8 @@ public class Seed
     {
         if (await context.Users.AnyAsync()) return;
 
-        var seedUsersData = await File.ReadAllBytesAsync("Data/UserSeedData.json");
-        var seedUsers = JsonSerializer.Deserialize<List<SeedUsersDto>>(seedUsersData);
+        var seedUsersData = await File.ReadAllTextAsync("Data/UserSeedData.json");
+        var seedUsers = JsonSerializer.Deserialize<List<SeedUserDto>>(seedUsersData);
 
         if (seedUsers == null)
         {
@@ -29,10 +29,9 @@ public class Seed
             {
                 Id = seedUser.Id,
                 Email = seedUser.Email,
+                UserName = seedUser.Email,
                 DisplayName = seedUser.DisplayName,
                 ImageUrl = seedUser.ImageUrl,
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("password")),
-                PasswordSalt = hmac.Key,
                 Member = new Member
                 {
                     Id = seedUser.Id,
@@ -47,6 +46,7 @@ public class Seed
                     Created = seedUser.Created
                 }
             };
+
             user.Member.Photos.Add(new Photo
             {
                 Url = seedUser.ImageUrl!,
@@ -55,6 +55,7 @@ public class Seed
 
             context.Users.Add(user);
         }
+
         await context.SaveChangesAsync();
     }
 }
