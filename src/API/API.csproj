@@ -30,7 +30,7 @@
     </ItemGroup>
     <Delete Files="@(FilesToDelete)" />
   </Target>
-  <!-- <Target Name="NSwag" BeforeTargets="CoreCompile;PrepareResource">
+  <Target Name="NSwag" BeforeTargets="CoreCompile;PrepareResource">
     <Exec Command="$(NSwagExe_Net90) run /runtime:Net90 /variables:OutputPath=$(MSBuildProjectDirectory)/$(IntermediateOutputPath)" WorkingDirectory="../../nswag" />
     <ItemGroup>
       <Compile Include="$(IntermediateOutputPath)/*.generated.cs" />
@@ -38,6 +38,6 @@
   </Target>
   <Target Name="NSwagSpec" AfterTargets="Build">
     <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" WorkingDirectory="../../nswag/document-generator" Command="$(NSwagExe_Net90) run openapi.nswag /variables:Configuration=$(Configuration),Project=$(MSBuildProjectDirectory)/$(MSBuildProjectFile),MsBuildOutputPath=$(MSBuildProjectDirectory)/$(OutDir)" />
-  </Target> -->
+  </Target> 
 
 </Project>
