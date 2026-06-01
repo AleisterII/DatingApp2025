@@ -1,35 +1,43 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
+using System.Collections.Concurrent;
 
 namespace API.SignalR;
 
-[Authorize]
-public class PresenceHub(PresenceTracker presenceTracker) : Hub
+public class PresenceTracker
 {
-    public override async Task OnConnectedAsync()
+    public static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> OnlineUsers = new();
+
+    public Task UserConnected(string userId, string connectionId)
     {
-        await presenceTracker.UserConnected(GetUserId(), Context.ConnectionId);
-        await Clients.Others.SendAsync("UserOnline", GetUserId());
-        await GetOnlineUsers();
+        var connections = OnlineUsers.GetOrAdd(userId, _ => new ConcurrentDictionary<string, byte>());
+        connections.TryAdd(connectionId, 0);
+        return Task.CompletedTask;
     }
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
+    public Task UserDisconnected(string userId, string connectionId)
     {
-        await presenceTracker.UserDisconnected(GetUserId(), Context.ConnectionId);
-        await Clients.Others.SendAsync("UserOffline", GetUserId());
-        await GetOnlineUsers();
-        await base.OnDisconnectedAsync(exception);
+        if (OnlineUsers.TryGetValue(userId, out var connections))
+        {
+            connections.TryRemove(connectionId, out _);
+            if (connections.IsEmpty)
+            {
+                OnlineUsers.TryRemove(userId, out _);
+            }
+        }
+        return Task.CompletedTask;
     }
 
-    private string GetUserId()
+    public Task<string[]> GetOnlineUsers()
     {
-        return Context.User?.FindFirstValue(ClaimTypes.Email) ?? throw new HubException("Cannot get member id");
+        return Task.FromResult(OnlineUsers.Keys.OrderBy(k => k).ToArray());
     }
 
-    private async Task GetOnlineUsers()
+    public static Task<List<string>> GetConnectionsForUser(string userId)
     {
-        var currentUsers = await presenceTracker.GetOnlineUsers();
-        await Clients.Caller.SendAsync("GetOnlineUsers", currentUsers);
+        if (OnlineUsers.TryGetValue(userId, out var connections))
+        {
+            return Task.FromResult(connections.Keys.ToList());
+        }
+
+        return Task.FromResult(new List<string>());
     }
 }
