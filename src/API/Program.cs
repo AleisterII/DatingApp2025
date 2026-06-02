@@ -51,6 +51,7 @@ public static class Program
             var context = services.GetRequiredService<AppDbContext>();
             var userManager = services.GetRequiredService<UserManager<AppUser>>();
             context.Database.Migrate();
+            context.Connections.ExecuteDelete();
             Task.Run(() => Seed.SeedUsers(userManager));
         }
         catch (Exception ex)
@@ -84,6 +85,7 @@ public static class Program
         app.UseAuthorization();
         app.MapControllers();
         app.MapHub<PresenceHub>("hubs/presence");
+        app.MapHub<MessageHub>("hubs/messages");
         app.Run();
     }
 
